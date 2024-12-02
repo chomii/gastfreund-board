@@ -10,8 +10,8 @@ export function DroppableContainer({ children, id }: DroppableContainerProps) {
   });
 
   return (
-    <ul ref={setNodeRef} className="list-none flex flex-col gap-4 mt-4 flex-1">
+    <div className="flex flex-grow" ref={setNodeRef}>
       {children}
-    </ul>
+    </div>
   );
 }

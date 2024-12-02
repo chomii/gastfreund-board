@@ -4,13 +4,15 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
-import { ColumnType, TaskItem } from '@/types';
+import { Column } from '@/types';
 
 type State = {
-  columns: { id: ColumnType; title: string; items: TaskItem[] }[];
+  searchTerm: string;
+  columns: Column[];
 };
 
 type Actions = {
+  setSearchTerm: (val: string) => void;
   updateColumns: (activeId: UniqueIdentifier, overId: UniqueIdentifier) => void;
   addTask: (id: UniqueIdentifier) => void;
   updateTask: (id: UniqueIdentifier, value: string) => void;
@@ -20,40 +22,37 @@ type Actions = {
 export const useKanbanStore = create<State & Actions>()(
   persist(
     immer((set) => ({
+      searchTerm: '',
       columns: [
         {
           id: 'column-todo',
           title: 'To Do',
-          items: [
-            // { id: '1', text: 'Item-todo-1' },
-            // { id: '2', text: 'Item-todo-2' },
-            // { id: '3', text: 'Item-todo-3' },
-          ],
+          items: [],
         },
         {
           id: 'column-in-progress',
           title: 'In Progress',
-          items: [
-            // { id: '4', text: 'Item-progress-1' },
-            // { id: '5', text: 'Item-progress-2' },
-          ],
+          items: [],
         },
         {
           id: 'column-done',
           title: 'Done',
-          items: [
-            // { id: '6', text: 'Item-done-1' }
-          ],
+          items: [],
         },
       ],
+      setSearchTerm: (val: string) =>
+        set((state) => {
+          state.searchTerm = val;
+        }),
       updateColumns: (activeId: UniqueIdentifier, overId: UniqueIdentifier) =>
         set((state) => {
-          // Finding active column from which we are taking item
+          // we are finding active column from which we are taking item
           const activeColumn = state.columns.find((col) =>
             col.items.some((item) => item.id === activeId),
           );
 
           if (!activeColumn) return;
+          // we are finding active item that we are dragging
           const activeItemIndex = activeColumn.items.findIndex(
             (item) => item.id === activeId,
           );
@@ -61,6 +60,7 @@ export const useKanbanStore = create<State & Actions>()(
 
           if (activeItemIndex === -1) return;
 
+          // case where we are dragging over empty column
           const isTargetEmptyColumn =
             typeof overId === 'string' && overId.includes('column');
           if (isTargetEmptyColumn) {
@@ -69,6 +69,7 @@ export const useKanbanStore = create<State & Actions>()(
             const [movedItem] = activeColumn.items.splice(activeItemIndex, 1);
             overColumn.items.push(movedItem);
           } else {
+            // we are finding column that contains target item
             const overColumn = state.columns.find((col) =>
               col.items.some((item) => item.id === overId),
             );
@@ -77,9 +78,10 @@ export const useKanbanStore = create<State & Actions>()(
             const overItemIndex = overColumn.items.findIndex(
               (item) => item.id === overId,
             );
+            // we are finding target item that we are dragging over to
             const overColumnIndex = state.columns.indexOf(overColumn);
 
-            // Reorder logic
+            // switching places for active and target items
             if (activeColumnIndex === overColumnIndex) {
               const column = state.columns[activeColumnIndex];
               column.items = arrayMove(
@@ -104,10 +106,12 @@ export const useKanbanStore = create<State & Actions>()(
           const currentColumn = state.columns.find((col) =>
             col.items.some((item) => item.id === id),
           );
+
           if (!currentColumn) return;
           const currentItem = currentColumn.items.find(
             (item) => item.id === id,
           );
+
           if (!currentItem) return;
           currentItem.text = value;
         }),
