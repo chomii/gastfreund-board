@@ -1,6 +1,6 @@
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { XIcon } from 'lucide-react';
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -20,6 +20,7 @@ export const Task = memo(
     const [showInput, setShowInput] = useState(false);
     const [value, setValue] = useState(() => text);
     const outsideClickRef = useRef(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const updateTask = useKanbanStore((state) => state.updateTask);
     const removeTask = useKanbanStore((state) => state.removeTask);
@@ -30,12 +31,18 @@ export const Task = memo(
     const handleCloseInput = useCallback(() => {
       setShowInput(false);
     }, []);
-    const handleSave = useCallback(() => {
+    const handleSave = () => {
       updateTask(id, value);
       setShowInput(false);
-    }, [id, value, updateTask]);
+    };
 
     useClickOutside(outsideClickRef, handleCloseInput);
+
+    useEffect(() => {
+      if (showInput && inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, [showInput]);
 
     return (
       <Card className="group" onDoubleClick={handleShowInput}>
@@ -50,6 +57,7 @@ export const Task = memo(
               removeTask(id);
             }}
             onMouseDown={(e) => e.stopPropagation()}
+            aria-label="Delete Task"
           >
             <XIcon />
           </Button>
@@ -59,6 +67,8 @@ export const Task = memo(
             <CardContent ref={outsideClickRef}>
               <Label htmlFor="task-input">Task text</Label>
               <Input
+                id="task-input"
+                ref={inputRef}
                 className="p-3 h-10"
                 type="text"
                 placeholder="Add task"

@@ -120,7 +120,7 @@ export const useKanbanStore = create<State & Actions>()(
           const currentColumn = state.columns.find((col) =>
             col.items.some((item) => item.id === id),
           );
-          console.log({ currentColumn });
+
           if (!currentColumn) return;
           currentColumn.items = currentColumn.items.filter(
             (el) => el.id !== id,
