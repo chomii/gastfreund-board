@@ -41,7 +41,7 @@ export const Kanban = () => {
         </div>
       }
     >
-      <section className="flex flex-row gap-4 flex-grow">
+      <section className="flex flex-row gap-4 min-h-full min-w-[768px]">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCorners}

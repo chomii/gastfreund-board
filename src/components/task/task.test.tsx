@@ -31,9 +31,7 @@ describe('Task Component', () => {
       },
     );
   });
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
+
   it('renders the task with given text', () => {
     const { getByText } = render(<Task id="1" text="Sample Task" />);
     expect(getByText('Sample Task')).toBeInTheDocument();

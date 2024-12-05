@@ -1,5 +1,6 @@
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
+import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -63,6 +64,7 @@ export const useKanbanStore = create<State & Actions>()(
           // case where we are dragging over empty column
           const isTargetEmptyColumn =
             typeof overId === 'string' && overId.includes('column');
+
           if (isTargetEmptyColumn) {
             const overColumn = state.columns.find((col) => col.id === overId);
             if (!overColumn) return;
@@ -99,7 +101,7 @@ export const useKanbanStore = create<State & Actions>()(
         set((state) => {
           const currentColumn = state.columns.find((col) => col.id === id);
           if (!currentColumn) return;
-          currentColumn.items.push({ id: Date.now(), text: 'New task' });
+          currentColumn.items.push({ id: uuidv4(), text: 'New task' });
         }),
       updateTask: (id: UniqueIdentifier, value: string) =>
         set((state) => {

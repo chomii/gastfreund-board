@@ -18,7 +18,7 @@ export const Column = ({ children, bgColor }: ColumnProps) => {
   return (
     <div
       className={cn(
-        `flex flex-col justify-start flex-1 flex-grow p-4 rounded-lg gap-4`,
+        `flex flex-col justify-start flex-1 flex-grow p-4 rounded-lg gap-4 min-w-[300px]`,
         bgColor,
       )}
     >
